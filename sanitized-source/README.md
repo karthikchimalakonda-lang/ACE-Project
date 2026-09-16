@@ -1,4 +1,4 @@
-# Sanitized source intake
+﻿# Sanitized source intake
 
 Copy reviewed function folders here only after sanitization. Use these generic folder names:
 

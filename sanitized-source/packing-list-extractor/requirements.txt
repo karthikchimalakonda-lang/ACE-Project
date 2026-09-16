@@ -1,0 +1,5 @@
+﻿fdk>=0.1.68
+oci>=2.120.0
+pdfplumber>=0.11.0
+pypdf>=4.0.0
+pillow>=10.0.0
