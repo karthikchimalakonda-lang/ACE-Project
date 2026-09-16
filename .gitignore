@@ -1,0 +1,35 @@
+# Credentials and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+config
+oci_config
+client_secret*.json
+service-account*.json
+
+# Real documents and generated workflow data
+evidence/raw/
+data/private/
+*.pdf
+*.xlsx
+*.csv
+*_manifest.json
+*_extracted.json
+
+# Python and Streamlit
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+.streamlit/secrets.toml
+
+# Editor and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

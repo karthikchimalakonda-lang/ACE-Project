@@ -1,0 +1,21 @@
+flowchart LR
+    user[Operations User] --> ui[Streamlit User Interface]
+    ui --> objectStorage[(OCI Object Storage)]
+    ui --> classifier[Document Classifier Function]
+    classifier --> packingOrchestrator[Packing List Orchestrator]
+    classifier --> invoiceOrchestrator[Invoice Orchestrator]
+    classifier --> bolOrchestrator[Bill of Lading Orchestrator]
+    packingOrchestrator --> packingExtractor[Packing List Extractor]
+    invoiceOrchestrator --> invoiceExtractor[Invoice Extractor]
+    bolOrchestrator --> bolExtractor[Bill of Lading Extractor]
+    packingExtractor --> genAI[OCI Generative AI]
+    invoiceExtractor --> genAI
+    bolExtractor --> genAI
+    packingExtractor --> objectStorage
+    invoiceExtractor --> objectStorage
+    bolExtractor --> objectStorage
+    objectStorage --> merger[Shipment Merger Function]
+    merger --> mapper[Item Mapper and Validator]
+    mapper --> target[OTM Integration-ready Payload]
+    mapper --> status[Workflow Status Function]
+    status --> ui
