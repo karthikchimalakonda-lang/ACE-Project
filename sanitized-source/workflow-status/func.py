@@ -1,4 +1,6 @@
-﻿import io
+﻿"""OCI Function that retrieves sanitized workflow status from Object Storage for the Streamlit interface."""
+
+import io
 import json
 import os
 import logging
@@ -64,7 +66,6 @@ def handler(ctx, data: io.BytesIO = None):
 
         os_client = get_os_client()
 
-        # â”€â”€ Check shipment manifest â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         manifest = read_object(os_client, f"Shipments/{shipment_id}.json")
         if not manifest:
             return response.Response(
@@ -78,7 +79,6 @@ def handler(ctx, data: io.BytesIO = None):
                 headers={"Content-Type": "application/json"},
             )
 
-        # â”€â”€ LPN files â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         if doc_type in ("lpn_putaway", "lpn_split", "lpn"):
             keys    = list_objects(os_client, f"LPN/{shipment_id}/")
             results = []
@@ -109,7 +109,6 @@ def handler(ctx, data: io.BytesIO = None):
                 headers={"Content-Type": "application/json"},
             )
 
-        # â”€â”€ Packing list / invoice / BOL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         docs     = manifest.get("documents", {})
         results  = {}
         all_done = True
@@ -118,7 +117,6 @@ def handler(ctx, data: io.BytesIO = None):
             req_id = doc_info.get("requestId")
             dtype  = doc_key.rsplit("_", 1)[0]  # packing_list, invoice, lpn_putaway, lpn_split
 
-            # â”€â”€ LPN types â€” saved directly in LPN/ folder â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             if dtype in ("lpn_putaway", "lpn_split"):
                 keys = list_objects(os_client, f"LPN/{shipment_id}/")
                 lpn_files = [k for k in keys if k.endswith(".json") and dtype in k]
@@ -136,7 +134,6 @@ def handler(ctx, data: io.BytesIO = None):
                     }
                 continue
 
-            # â”€â”€ Packing list / invoice / BOL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             if dtype == "packing_list":
                 folder = f"Packing List/{req_id}"
             elif dtype == "invoice":

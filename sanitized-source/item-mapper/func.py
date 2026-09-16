@@ -70,9 +70,6 @@ from oci.generative_ai_inference.models import (
 from fdk import response as fdk_response
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-#  SECTION 1  â€”  CONFIGURATION
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 OCI_COMPARTMENT_ID     = os.getenv("OCI_COMPARTMENT_ID", "")
 OS_NAMESPACE           = os.getenv("OS_NAMESPACE",        "sample_namespace")
@@ -84,14 +81,11 @@ OCI_MODEL_ID           = os.getenv("OCI_MODEL_ID",
 DEFAULT_ITEM_MASTER    = os.getenv("ITEM_MASTER_PATH", "Config/SAMPLE_ORG_Item_Master.csv")
 MAPPING_FOLDER         = os.getenv("MAPPING_FOLDER",     "Mapping")
 
-# SR-016 thresholds â€” configurable via env (SR-017)
 FUZZY_THRESHOLD        = float(os.getenv("FUZZY_THRESHOLD",   "0.90"))
 AI_MIN_CONFIDENCE      = float(os.getenv("AI_MIN_CONFIDENCE", "0.80"))
 
-# SR-028 weight tolerance â€” configurable
 WEIGHT_TOLERANCE_PCT   = float(os.getenv("WEIGHT_TOLERANCE_PCT", "2.0"))
 
-# SR-013 spare parts keywords
 SPARE_KEYWORDS = [
     "spare part", "spare parts", "spare", "accessories", "accessory",
     "consumable", "consumables", "maintenance kit", "after sales",
@@ -100,9 +94,6 @@ SPARE_KEYWORDS = [
 TMP_DIR = "/tmp/SAMPLE_ORG_mapper"
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-#  SECTION 2  â€”  LOGGING
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 class _Tee(logging.StreamHandler):
     def emit(self, record):
@@ -118,9 +109,6 @@ def _plog(msg, *a):
     print(f"â–¶ {msg % a if a else msg}", flush=True)
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-#  SECTION 3  â€”  OCI HELPERS
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 def _signer():
     return get_resource_principals_signer()
@@ -150,9 +138,6 @@ def download(os_cli, key: str) -> Optional[str]:
         log.warning("Download failed %s: %s", key, e); return None
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-#  SECTION 4  â€”  ITEM MASTER  (SR-017: CSV-driven, SAMPLE_ORG-maintainable)
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 class ItemMaster:
     """
@@ -250,9 +235,6 @@ class ItemMaster:
         return str(row.get("is_spare_part", "")).strip().upper() in ("TRUE", "1", "YES")
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-#  SECTION 5  â€”  SPARE PARTS CHECK  (SR-013)
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 def _is_spare(item: dict, master: ItemMaster) -> bool:
     """
@@ -263,7 +245,6 @@ def _is_spare(item: dict, master: ItemMaster) -> bool:
     desc = (item.get("description") or "").lower()
     if any(kw in desc for kw in SPARE_KEYWORDS):
         return True
-    # Check master flag if item_no is a SAMPLE_ORG code
     item_no = (item.get("item_no") or "").strip()
     if item_no:
         row = master.SAMPLE_ORG(item_no)
@@ -272,9 +253,6 @@ def _is_spare(item: dict, master: ItemMaster) -> bool:
     return False
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-#  SECTION 6  â€”  MAPPING RESULT BUILDER
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 def _hit(strategy: str, row: dict, matched_on: str,
          source: str, confidence: float = 1.0, **extra) -> dict:
@@ -289,9 +267,6 @@ def _hit(strategy: str, row: dict, matched_on: str,
     }
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-#  SECTION 7  â€”  STRATEGY 1: DIRECT SAMPLE_ORG CODE  (SR-014)
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 def s1_direct_SAMPLE_ORG(item: dict, master: ItemMaster) -> Optional[dict]:
     """
@@ -308,9 +283,6 @@ def s1_direct_SAMPLE_ORG(item: dict, master: ItemMaster) -> Optional[dict]:
     return None
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-#  SECTION 8  â€”  STRATEGY 2: SUPPLIER CODE LOOKUP  (SR-015)
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 def s2_supplier_code(item: dict, supplier: str,
                      master: ItemMaster) -> Optional[dict]:
@@ -332,9 +304,6 @@ def s2_supplier_code(item: dict, supplier: str,
     return None
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-#  SECTION 9  â€”  STRATEGY 3: SupplierB CUSTOMER MATERIAL NUMBER  (SR-015)
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 def s3_SupplierB_cmn(item: dict, master: ItemMaster) -> Optional[dict]:
     """
@@ -345,22 +314,16 @@ def s3_SupplierB_cmn(item: dict, master: ItemMaster) -> Optional[dict]:
         val = (item.get(field) or "").strip()
         if not val:
             continue
-        # Try CMN index
         row = master.cmn(val)
         if row:
             return _hit("S3_SupplierB_CMN", row, field, val)
-        # Try direct SAMPLE_ORG lookup (CMN may equal SAMPLE_ORG code)
         row = master.SAMPLE_ORG(val)
         if row:
             return _hit("S3_SupplierB_CMN", row, f"{field}_as_SAMPLE_ORG", val)
     return None
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-#  SECTION 10  â€”  STRATEGY 4: SupplierC PRODUCT CODE  (SR-015)
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
-# SupplierC product code pattern: ZRnnKCE-TFD, ZRnnKCE-TWD etc.
 _SupplierC_RE = re.compile(r"\bZR\d+[A-Z]{2,3}-[A-Z]{3}\b", re.IGNORECASE)
 
 def s4_SupplierC(item: dict, master: ItemMaster) -> Optional[dict]:
@@ -369,18 +332,15 @@ def s4_SupplierC(item: dict, master: ItemMaster) -> Optional[dict]:
     Checks item_no field and extracts from description if needed.
     Also validates against po_number per line (SR-006).
     """
-    # Check item_no directly
     item_no = (item.get("item_no") or "").strip()
     if item_no:
         row = master.SupplierC(item_no)
         if row:
             return _hit("S4_SupplierC", row, "item_no_SupplierC_code", item_no)
-        # Try alternate codes
         row = master.alternate(item_no)
         if row:
             return _hit("S4_SupplierC_ALT", row, "alternate_code", item_no)
 
-    # Extract from description
     desc = (item.get("description") or "")
     matches = _SupplierC_RE.findall(desc)
     for m in matches:
@@ -394,11 +354,7 @@ def s4_SupplierC(item: dict, master: ItemMaster) -> Optional[dict]:
     return None
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-#  SECTION 11  â€”  STRATEGY 5: SupplierD MODEL CODE  (SR-016)
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
-# SupplierD model code pattern: RC2-470B, RC2-550B, RC2-620C etc.
 _SupplierD_RE = re.compile(r"\bRC\d+-\d+[A-Z]?\b", re.IGNORECASE)
 
 def s5_SupplierD_model(item: dict, master: ItemMaster) -> Optional[dict]:
@@ -408,7 +364,6 @@ def s5_SupplierD_model(item: dict, master: ItemMaster) -> Optional[dict]:
     Checks model_code field, item_no, then extracts from description.
     Also checks alternate codes.
     """
-    # Explicit model_code field
     mc = (item.get("model_code") or "").strip().upper()
     if mc:
         row = master.model(mc)
@@ -418,7 +373,6 @@ def s5_SupplierD_model(item: dict, master: ItemMaster) -> Optional[dict]:
         if row:
             return _hit("S5_SupplierD_MODEL_ALT", row, "model_code_alt", mc)
 
-    # item_no might be the SupplierD code
     item_no = (item.get("item_no") or "").strip().upper()
     if item_no:
         row = master.model(item_no)
@@ -428,7 +382,6 @@ def s5_SupplierD_model(item: dict, master: ItemMaster) -> Optional[dict]:
         if row:
             return _hit("S5_SupplierD_SC", row, "SupplierD_supplier_code", item_no)
 
-    # Extract from description
     desc = (item.get("description") or "")
     matches = _SupplierD_RE.findall(desc)
     for m in matches:
@@ -443,9 +396,6 @@ def s5_SupplierD_model(item: dict, master: ItemMaster) -> Optional[dict]:
     return None
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-#  SECTION 12  â€”  STRATEGY 6: ALTERNATE CODES  (SR-016)
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 def s6_alternate(item: dict, master: ItemMaster) -> Optional[dict]:
     """
@@ -456,7 +406,6 @@ def s6_alternate(item: dict, master: ItemMaster) -> Optional[dict]:
         val = (item.get(field) or "").strip()
         if not val:
             continue
-        # Try with hyphens removed (RC2-470B â†’ RC2470B)
         for candidate in [val, val.replace("-", ""), val.replace(" ", "")]:
             row = master.alternate(candidate.upper())
             if row:
@@ -465,9 +414,6 @@ def s6_alternate(item: dict, master: ItemMaster) -> Optional[dict]:
     return None
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-#  SECTION 13  â€”  STRATEGY 7: DIFFLIB FUZZY MATCH  (SR-016)
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 def _sim(a: str, b: str) -> float:
     return SequenceMatcher(None, a.lower(), b.lower()).ratio()
@@ -493,7 +439,6 @@ def s7_fuzzy(item: dict, supplier: str, master: ItemMaster,
     best_score, best_row = 0.0, None
 
     for row in rows:
-        # Skip spare parts in fuzzy â€” don't match spare to regular item
         if master.is_spare(row):
             continue
         candidate = " ".join(filter(None, [
@@ -515,9 +460,6 @@ def s7_fuzzy(item: dict, supplier: str, master: ItemMaster,
     return None
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-#  SECTION 14  â€”  STRATEGY 8: AI SEMANTIC MATCH  (SR-016 fallback)
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 _AI_PROMPT = """\
 You are a logistics item code resolver for SampleLogisticsOrganization Air Conditioners (SAMPLE_ORG).
@@ -601,7 +543,6 @@ def s8_ai_semantic(item: dict, supplier: str, master: ItemMaster,
                             item_no or desc, confidence=conf,
                             ai_reasoning=reason)
 
-        # Below threshold â€” still return for flagging (SR-018)
         if zc and conf > 0:
             return {"strategy": "S8_AI_LOW_CONF", "SAMPLE_ORG_item_code": zc,
                     "confidence": conf, "ai_reasoning": reason,
@@ -615,9 +556,6 @@ def s8_ai_semantic(item: dict, supplier: str, master: ItemMaster,
     return None
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-#  SECTION 15  â€”  SINGLE ITEM MAPPER  (cascade)
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 def _map_one(item: dict, supplier: str, master: ItemMaster,
              genai: Optional[GenerativeAiInferenceClient]) -> dict:
@@ -627,14 +565,12 @@ def _map_one(item: dict, supplier: str, master: ItemMaster,
     """
     s = (supplier or "").strip().upper()
 
-    # â”€â”€ Exclusion first (SR-013) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     if _is_spare(item, master):
         return {**item, "mapping_status": "EXCLUDED",
                 "exclusion_reason": "spare_part_keyword_or_flag",
                 "SAMPLE_ORG_item_code": None, "mapping_strategy": "EXCLUDED",
                 "mapping_confidence": None}
 
-    # â”€â”€ Strategy cascade â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     result = (
         s1_direct_SAMPLE_ORG(item, master)      or
         s2_supplier_code(item, s, master) or
@@ -663,15 +599,11 @@ def _map_one(item: dict, supplier: str, master: ItemMaster,
                 "ai_reasoning":        result.get("ai_reasoning"),
                 "fuzzy_score":         result.get("fuzzy_score")}
 
-    # â”€â”€ No match â€” SR-018 flag â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     return {**item, "mapping_status": "UNMATCHED", "SAMPLE_ORG_item_code": None,
             "SAMPLE_ORG_description": None, "mapping_strategy": "NONE",
             "mapping_confidence": None, "mapping_matched_on": None}
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-#  SECTION 16  â€”  DOCUMENT ITEM COLLECTOR
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 def _collect_items(extracted: dict, source_label: str) -> List[dict]:
     """
@@ -681,7 +613,6 @@ def _collect_items(extracted: dict, source_label: str) -> List[dict]:
     """
     items = []
 
-    # Packing list packages
     for pkg in (extracted.get("packages") or []):
         base = {
             "source_doc":  source_label,
@@ -692,12 +623,10 @@ def _collect_items(extracted: dict, source_label: str) -> List[dict]:
             "dimensions_cm":   pkg.get("dimensions_cm"),
             "cbm":             pkg.get("cbm"),
         }
-        # New line_items structure
         if pkg.get("line_items"):
             for li in pkg["line_items"]:
                 items.append({**base, **li})
         else:
-            # Old flat structure
             items.append({**base,
                 "item_no":     pkg.get("item_no"),
                 "description": pkg.get("description"),
@@ -711,7 +640,6 @@ def _collect_items(extracted: dict, source_label: str) -> List[dict]:
                 "hs_code":     pkg.get("hs_code"),
             })
 
-    # Invoice line items
     for li in (extracted.get("line_items") or []):
         items.append({
             "source_doc":  source_label,
@@ -730,9 +658,6 @@ def _collect_items(extracted: dict, source_label: str) -> List[dict]:
     return items
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-#  SECTION 17  â€”  TCL DUAL PL HANDLING  (SR-003)
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 def _resolve_tcl_product_line(extracted: dict) -> str:
     """
@@ -745,7 +670,6 @@ def _resolve_tcl_product_line(extracted: dict) -> str:
         return "IDU"
     if "ODU" in pl or "OUTDOOR" in pl:
         return "ODU"
-    # Scan items
     for pkg in (extracted.get("packages") or []):
         item_no = (pkg.get("item_no") or "").upper()
         if "IDU" in item_no:
@@ -755,9 +679,6 @@ def _resolve_tcl_product_line(extracted: dict) -> str:
     return "UNKNOWN"
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-#  SECTION 18  â€”  SR-027: 3-WAY QUANTITY RECONCILIATION
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 def _reconcile_quantities(pl_items: List[dict], inv_items: List[dict],
                            bl_data: dict) -> List[dict]:
@@ -771,21 +692,18 @@ def _reconcile_quantities(pl_items: List[dict], inv_items: List[dict],
 
     flags = []
 
-    # Build PL qty index: item_no â†’ total qty
     pl_qty: Dict[str, float] = {}
     for item in pl_items:
         key = (item.get("item_no") or "").strip().upper()
         if key:
             pl_qty[key] = pl_qty.get(key, 0) + (item.get("quantity") or 0)
 
-    # Build Invoice qty index
     inv_qty: Dict[str, float] = {}
     for item in inv_items:
         key = (item.get("item_no") or "").strip().upper()
         if key:
             inv_qty[key] = inv_qty.get(key, 0) + (item.get("quantity") or 0)
 
-    # Compare PL vs Invoice
     all_keys = set(pl_qty.keys()) | set(inv_qty.keys())
     for k in all_keys:
         pq = pl_qty.get(k, 0)
@@ -799,7 +717,6 @@ def _reconcile_quantities(pl_items: List[dict], inv_items: List[dict],
                 "flag":             "SR027_QTY_MISMATCH_PL_VS_INV",
             })
 
-    # BL qty check (BL usually shows total, not per item)
     bl_total_qty = (bl_data or {}).get("total_quantity")
     pl_total     = sum(pl_qty.values())
     if bl_total_qty and abs(pl_total - bl_total_qty) > 1:
@@ -814,9 +731,6 @@ def _reconcile_quantities(pl_items: List[dict], inv_items: List[dict],
     return flags
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-#  SECTION 19  â€”  SR-028: NET WEIGHT VALIDATION
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 def _validate_weight(pl_data: dict, bl_data: dict,
                      tolerance_pct: float = WEIGHT_TOLERANCE_PCT) -> Optional[dict]:
@@ -835,8 +749,6 @@ def _validate_weight(pl_data: dict, bl_data: dict,
     if not pl_net or not bl_gross:
         return None
 
-    # PL net < BL gross always (net < gross by packaging weight)
-    # Flag if PL net > BL gross (impossible) or difference > tolerance
     if pl_net > bl_gross:
         return {
             "flag":        "SR028_NET_EXCEEDS_GROSS",
@@ -845,7 +757,6 @@ def _validate_weight(pl_data: dict, bl_data: dict,
             "diff_pct":    round((pl_net - bl_gross) / bl_gross * 100, 2),
         }
 
-    # Check PL gross weight vs BL gross
     pl_gross = pl_data.get("total_gross_weight_kg") or 0
     if pl_gross and bl_gross:
         diff_pct = abs(pl_gross - bl_gross) / bl_gross * 100
@@ -861,9 +772,6 @@ def _validate_weight(pl_data: dict, bl_data: dict,
     return None
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-#  SECTION 20  â€”  BATCH MAP
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 def _batch_map(items: List[dict], supplier: str, master: ItemMaster,
                genai) -> Tuple[List, List, List]:
@@ -881,9 +789,6 @@ def _batch_map(items: List[dict], supplier: str, master: ItemMaster,
     return mapped, unmatched, excluded
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-#  SECTION 21  â€”  SR-029 SUMMARY
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 def _build_summary(mapped, unmatched, excluded, qty_flags, weight_flag,
                    supplier, shipment_id, tcl_pl="") -> dict:
@@ -896,7 +801,6 @@ def _build_summary(mapped, unmatched, excluded, qty_flags, weight_flag,
         s = i.get("mapping_strategy", "?")
         strategy_counts[s] = strategy_counts.get(s, 0) + 1
 
-    # SR-030: halt if any unresolved or review items
     halt = bool(unmatched or review or qty_flags or weight_flag)
 
     halt_reasons = []
@@ -945,9 +849,6 @@ def _build_summary(mapped, unmatched, excluded, qty_flags, weight_flag,
     }
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-#  SECTION 22  â€”  SR-031 CSV AUDIT REPORT
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 def _build_csv(mapped, unmatched, excluded) -> str:
     """SR-031: Complete audit trail."""
@@ -971,9 +872,6 @@ def _build_csv(mapped, unmatched, excluded) -> str:
     return buf.getvalue()
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-#  SECTION 23  â€”  MAIN ORCHESTRATOR
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 def _safe(s: str) -> str:
     return re.sub(r"[^\w\-]", "_", s or "unknown")
@@ -993,10 +891,8 @@ def run_mapping(os_cli, genai, body: dict) -> dict:
     _plog("="*60)
     _plog("SAMPLE_ORG Item Mapper v2.0.0 | shp=%s | supplier=%s", shipment_id, supplier)
 
-    # â”€â”€ Load master â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     master = ItemMaster.load(os_cli, master_path)
 
-    # â”€â”€ Load documents â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     def _load(path):
         if not path: return {}
         raw = download(os_cli, path)
@@ -1008,14 +904,12 @@ def run_mapping(os_cli, genai, body: dict) -> dict:
     inv2_data = _load(inv2_path)
     bl_data   = _load(bl_path)
 
-    # â”€â”€ TCL product line detection (SR-003) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     tcl_pl = ""
     if "TCL" in (supplier or "").upper():
         tcl_pl  = _resolve_tcl_product_line(pl_data)
         tcl_pl2 = _resolve_tcl_product_line(pl2_data) if pl2_data else ""
         _plog("TCL PL1=%s PL2=%s", tcl_pl, tcl_pl2)
 
-    # â”€â”€ Collect all items â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     all_items: List[dict] = []
     if pl_data:
         all_items += _collect_items(pl_data,  "packing_list_01")
@@ -1033,24 +927,20 @@ def run_mapping(os_cli, genai, body: dict) -> dict:
           len(_collect_items(inv_data, "")),
           len(_collect_items(inv2_data, "")) if inv2_data else 0)
 
-    # â”€â”€ Map all items â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     t0 = time.time()
     mapped, unmatched, excluded = _batch_map(all_items, supplier, master, genai)
     duration = round(time.time() - t0, 2)
 
-    # â”€â”€ SR-027: 3-way qty reconciliation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     pl_items  = _collect_items(pl_data,  "") + _collect_items(pl2_data,  "")
     inv_items = _collect_items(inv_data, "") + _collect_items(inv2_data, "")
     qty_flags = _reconcile_quantities(pl_items, inv_items, bl_data)
     if qty_flags:
         _plog("SR-027: %d quantity discrepancies", len(qty_flags))
 
-    # â”€â”€ SR-028: weight validation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     weight_flag = _validate_weight(pl_data, bl_data)
     if weight_flag:
         _plog("SR-028: weight flag: %s", weight_flag.get("flag"))
 
-    # â”€â”€ Build outputs â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     summary = _build_summary(mapped, unmatched, excluded, qty_flags,
                              weight_flag, supplier, shipment_id, tcl_pl)
     summary["durationSeconds"] = duration
@@ -1071,7 +961,6 @@ def run_mapping(os_cli, genai, body: dict) -> dict:
     upload(os_cli, json.dumps(summary,   indent=2, ensure_ascii=False), paths["summary"])
     upload(os_cli, csv_content, paths["csv_report"], "text/csv")
 
-    # â”€â”€ Log â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     _plog("="*60)
     _plog("MAPPING COMPLETE in %.1fs", duration)
     _plog("  Total:        %d", summary["totalItems"])
@@ -1106,9 +995,6 @@ def run_mapping(os_cli, genai, body: dict) -> dict:
     }
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-#  SECTION 24  â€”  OCI FUNCTIONS HANDLER
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 def handler(ctx, data: io.BytesIO = None):
     os.makedirs(TMP_DIR, exist_ok=True)
